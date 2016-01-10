@@ -31,6 +31,12 @@ class CBARCurrencies {
 		return $this->data;
 	}
 
+	public function listing() {
+		return array_map(function($record) {
+			return $record['code'] . ' - ' . $record['name'];
+		}, $this->data);
+	}
+
 	public function __call($name, $arguments) {
 		$name = strtoupper($name);
 		return (isset($this->data[$name]))? $this->data[$name] : null;
