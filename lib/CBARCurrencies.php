@@ -1,6 +1,6 @@
 <?php
 
-class CBARAPI {
+class CBARCurrencies {
 
 	private $data = null;
 	
@@ -11,18 +11,20 @@ class CBARAPI {
         	return $data;
     	}
 	
-	public function all($reload = false) {
+	public function all($reload = false, $date = null) {
 		if(!$this->data OR $reload) {
-			$url = 'http://www.cbar.az/currencies/'.date('d.m.Y') . '.xml';
+			$url = 'http://www.cbar.az/currencies/'. (is_null($date) ? date('d.m.Y') : $date) .'.xml';
 			$data = file_get_contents($url);
 			$data = $this->xmlToArray($data);
-			$data = (isset($data['ValType'][1]['Valute']))? $data['ValType'][1]['Valute'] : [];
-			foreach($data AS $record) {
-				$this->data[strtoupper($record['@attributes']['Code'])] = [
-					'code' => $record['@attributes']['Code'],
-					'name' => $record['Name'],
-					'value' => $record['Value']
-				];
+			foreach($data['ValType'] AS $ValTypes) {
+				$ValTypes = $ValTypes['Valute'];
+				foreach($ValTypes AS $record) { 
+					$this->data[strtoupper($record['@attributes']['Code'])] = [
+						'code' => $record['@attributes']['Code'],
+						'name' => $record['Name'],
+						'value' => $record['Value']
+					];
+				}
 			}
 		}
 
